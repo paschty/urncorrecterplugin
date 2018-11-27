@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>urn-correcter-plugin</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <parent>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-parent</artifactId>
+        <version>38</version>
+    </parent>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
+                            <MCR-Application-Module>${project.name}</MCR-Application-Module>
+                            <Priority>99</Priority>
+                            <MCR-Auto-Deploy>true</MCR-Auto-Deploy>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.mycore</groupId>
+            <artifactId>mycore-base</artifactId>
+            <version>2018.06.0.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mycore</groupId>
+            <artifactId>mycore-pi</artifactId>
+            <version>2018.06.0.2-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>
