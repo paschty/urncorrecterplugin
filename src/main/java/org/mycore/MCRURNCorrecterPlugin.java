@@ -9,10 +9,10 @@ import javax.persistence.EntityManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -39,7 +39,8 @@ public class MCRURNCorrecterPlugin {
     @MCRCommand(
         syntax = "correct URN of {0}",
         help = "Corrects the URN of the object {0}")
-    public static void correctURNofObject(String objectIDString) throws MCRPersistentIdentifierException {
+    public static void correctURNofObject(String objectIDString)
+        throws MCRPersistentIdentifierException, MCRAccessException {
         final MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
         if(!MCRMetadataManager.exists(objectID)){
             LOGGER.error("Object with id {} does not exist!", objectIDString);
@@ -83,8 +84,11 @@ public class MCRURNCorrecterPlugin {
         // correct identifier in DB
         final MCRPI dnburn = MCRPIManager.getInstance().get("DNBURN", objectIDString, null);
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        em.remove(dnburn);
-        em.persist(new MCRPI(dnburn.getIdentifier(), dnburn.getType(), dnburn.getMycoreID(), dnburn.getAdditional(), dnburn.getService(), dnburn.getRegistered()));
+        MCRPIManager.getInstance()
+            .delete(dnburn.getMycoreID(), dnburn.getAdditional(), dnburn.getType(), dnburn.getService());
+        em.persist(new MCRPI(cleanURN.asString(), dnburn.getType(), dnburn.getMycoreID(), dnburn.getAdditional(), dnburn.getService(), dnburn.getRegistered()));
+
+        MCRMetadataManager.update(mcrBase);
     }
     private static Gson getGson() {
         return (new GsonBuilder()).registerTypeAdapter(Date.class, new MCRGsonUTCDateAdapter()).setExclusionStrategies(new ExclusionStrategy[]{new ExclusionStrategy() {
